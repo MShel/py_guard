@@ -3,11 +3,11 @@ import struct
 import math
 from queue import Queue
 import datetime
-
 '''
 lots of this class been taken from 
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
+_sentinelMic = object()
 
 class Mic:
     
@@ -44,7 +44,6 @@ class Mic:
         self.quiet_count = 0 
         self.queue = queue
         self.error_count = 0
-        self._sentinelMic = object()
         
     def get_rms(self, block):
         count = len(block) / 2
@@ -79,7 +78,7 @@ class Mic:
         else:  # if its to quiet...
             if 1 <= self.noisy_count <= self.MAX_TAP_BLOCKS:
                 print('tap')
-                self.queue.put(self._sentinelMic)
+                self.queue.put(_sentinelMic)
             self.noisy_count = 0
             self.quiet_count += 1
             

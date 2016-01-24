@@ -1,12 +1,7 @@
 from microphone.microphone import Mic
+from threads.abstract_thread import AbstractThread
 
-class MicrophoneThread():
-
-    def __init__(self):
-        self._running = True
-    
-    def stop(self):
-        self._running = False
+class MicrophoneThreadManager(AbstractThread):
     
     '''
     expects already setup Mic
