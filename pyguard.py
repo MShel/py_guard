@@ -6,6 +6,10 @@ import re
 from threading import Thread
 from microphone.microphone import Mic
 from pprint import pprint
+from microphone.microphone_thread import MicrophoneThreadManager
+from camera.camera_thread import CameraThreadManager
+from camera.camera import Camera
+import time
 
 sys.path.insert(0, os.getcwd())
 
@@ -43,10 +47,21 @@ def main(argv):
         '''
         need to spin the threads and get all the juzz up and running
         '''
-        # print('test')
-        q_microphone = Queue()        
-        microphone_thread = Thread(target=spin_microphone_listener, args=(q_microphone,))
+        q_microphone = Queue()     
+        mic = Mic(q_microphone)
+        
+        mic_thread_manager = MicrophoneThreadManager()   
+        microphone_thread = Thread(target=mic_thread_manager.run, args=(mic,))
         microphone_thread.start()
+       
+        camera = Camera(q_microphone)
+        camera_thread_manager = CameraThreadManager()   
+        camera_thread = Thread(target=camera_thread_manager.run, args=(camera,q_microphone))
+        camera_thread.start()
+       
+        time.sleep(15)
+        mic_thread_manager.stop()
+        microphone_thread.join()
         
     except getopt.GetoptError:
         print('test1')
@@ -61,19 +76,14 @@ def main(argv):
         print('test1')
         sys.exit(2)
     except KeyboardInterrupt:
+
         print('????test')
-        pprint(q_microphone)
-        pprint(q_microphone.get())
         sys.exit(1)
     ''''
     except ImportError:
         sys.exit(2)    
     '''
-def spin_microphone_listener(queue_mic):
-    mic = Mic(queue_mic)
-    print('!!!test!!!')
-    while True:
-        mic.listen()
+
         
     
 if __name__ == "__main__":

@@ -3,11 +3,11 @@ import struct
 import math
 from queue import Queue
 import datetime
-
 '''
 lots of this class been taken from 
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
+_sentinelMic = object()
 
 class Mic:
     
@@ -46,14 +46,6 @@ class Mic:
         self.error_count = 0
         
     def get_rms(self, block):
-
-        # RMS amplitude is defined as the square root of the 
-        # mean over time of the square of the amplitude.
-        # so we need to convert this string of bytes into 
-        # a string of 16-bit samples...
-
-        # we will get one short out for each 
-        # two chars in the string.
         count = len(block) / 2
         formatConvertWave = "%dh" % (count)
         shorts = struct.unpack(formatConvertWave, block)
@@ -71,10 +63,10 @@ class Mic:
     def listen(self):
         try:
             block = self.stream.read(self.INPUT_FRAMES_PER_BLOCK)  # |
-        except IOError as e:                                      #|---- just in case there is an error!
-            self.error_count += 1                                     #|
-            print( "(%d) Error recording: %s"%(self.errorcount,e) )  #|
-            self.noisy_count = 1                                      #]
+        except IOError as e:  # |---- just in case there is an error!
+            self.error_count += 1  # |
+            print("(%d) Error recording: %s" % (self.errorcount, e))  # |
+            self.noisy_count = 1  # ]
         
         amplitude = self.get_rms(block)
         
@@ -86,7 +78,7 @@ class Mic:
         else:  # if its to quiet...
             if 1 <= self.noisy_count <= self.MAX_TAP_BLOCKS:
                 print('tap')
-                self.queue.put(datetime.datetime.now())
+                self.queue.put(_sentinelMic)
             self.noisy_count = 0
             self.quiet_count += 1
             

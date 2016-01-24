@@ -1,16 +1,11 @@
-import threading
- 
-class MicrophoneThread(threading.Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
+from microphone.microphone import Mic
+from threads.abstract_thread import AbstractThread
 
-    def __init__(self):
-        super(MicrophoneThread, self).__init__()
-        self._stop = threading.Event()
+class MicrophoneThreadManager(AbstractThread):
     
-    def stop(self):
-        self._stop.set()
-
-    def stopped(self):
-        return self._stop.isSet()
-    
+    '''
+    expects already setup Mic
+    '''
+    def run(self, mic: Mic):
+        while self._running:
+            mic.listen()        
