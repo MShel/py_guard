@@ -76,7 +76,6 @@ class Mic:
                 self.tap_threshold *= 1.1  # turn down the sensitivity
         else:  # if its to quiet...
             if 1 <= self.noisy_count <= self.MAX_TAP_BLOCKS:
-                print('tap')
                 self.queue.put(_sentinelMic)
             self.noisy_count = 0
             self.quiet_count += 1

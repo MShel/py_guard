@@ -8,4 +8,4 @@ class MicrophoneThreadManager(AbstractThread):
     '''
     def run(self, mic: Mic):
         while self._running:
-            mic.listen()        
+            mic.listen()

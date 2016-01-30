@@ -10,6 +10,9 @@ from microphone.microphone_thread import MicrophoneThreadManager
 from camera.camera_thread import CameraThreadManager
 from camera.camera import Camera
 import time
+from archiver.snapshot_archiver import SnapshotArchiver
+from archiver.archiver_thread import ArchiverThreadManager
+from archiver import archiver_thread
 
 sys.path.insert(0, os.getcwd())
 
@@ -49,6 +52,11 @@ def main(argv):
         '''
         queue_for_everything = Queue()     
         mic = Mic(queue_for_everything)
+       
+        archiver = SnapshotArchiver()
+        archiver_thread_manager = ArchiverThreadManager()
+        archiver_thread = Thread(target=archiver_thread_manager.run,args=(archiver, queue_for_everything, './pictures/'))
+        archiver_thread.start()    
         
         mic_thread_manager = MicrophoneThreadManager()   
         microphone_thread = Thread(target=mic_thread_manager.run, args=(mic,))
@@ -59,6 +67,8 @@ def main(argv):
         camera_thread = Thread(target=camera_thread_manager.run, args=(camera,queue_for_everything))
         camera_thread.start()
        
+
+      
         '''
         time.sleep(15)
         mic_thread_manager.stop()
