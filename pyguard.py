@@ -47,21 +47,25 @@ def main(argv):
         '''
         need to spin the threads and get all the juzz up and running
         '''
-        q_microphone = Queue()     
-        mic = Mic(q_microphone)
+        queue_for_everything = Queue()     
+        mic = Mic(queue_for_everything)
         
         mic_thread_manager = MicrophoneThreadManager()   
         microphone_thread = Thread(target=mic_thread_manager.run, args=(mic,))
         microphone_thread.start()
        
-        camera = Camera(q_microphone)
+        camera = Camera(queue_for_everything)
         camera_thread_manager = CameraThreadManager()   
-        camera_thread = Thread(target=camera_thread_manager.run, args=(camera,q_microphone))
+        camera_thread = Thread(target=camera_thread_manager.run, args=(camera,queue_for_everything))
         camera_thread.start()
        
+        '''
         time.sleep(15)
         mic_thread_manager.stop()
+        camera_thread_manager.stop()
+        camera_thread.join()
         microphone_thread.join()
+        '''
         
     except getopt.GetoptError:
         print('test1')
