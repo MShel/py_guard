@@ -2,7 +2,6 @@ import pyaudio
 import struct
 import math
 from queue import Queue
-import datetime
 '''
 lots of this class been taken from 
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
@@ -12,7 +11,7 @@ _sentinelMic = object()
 class Mic:
     
     
-    INITIAL_TAP_THRESHOLD = 0.01
+    INITIAL_TAP_THRESHOLD = 0.010
     
     FORMAT = pyaudio.paInt16 
     
@@ -30,7 +29,7 @@ class Mic:
 
     UNDERSENSITIVE = 120.0 / INPUT_BLOCK_TIME
 
-    MAX_TAP_BLOCKS = 0.75 / INPUT_BLOCK_TIME  
+    MAX_TAP_BLOCKS = 0.15 / INPUT_BLOCK_TIME  
    
     def __init__(self, queue: Queue):
         py_audio = pyaudio.PyAudio() 
@@ -77,7 +76,6 @@ class Mic:
                 self.tap_threshold *= 1.1  # turn down the sensitivity
         else:  # if its to quiet...
             if 1 <= self.noisy_count <= self.MAX_TAP_BLOCKS:
-                print('tap')
                 self.queue.put(_sentinelMic)
             self.noisy_count = 0
             self.quiet_count += 1
