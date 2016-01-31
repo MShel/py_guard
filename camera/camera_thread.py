@@ -9,8 +9,8 @@ class CameraThreadManager(AbstractThread):
     
     def __init__(self):
         AbstractThread.__init__(self)
-        self.pictures_amount = 9
-        self.taps_count = 4
+        self.pictures_amount = 1
+        self.taps_count = 2
         self.pictures_directory = './pictures/'
     '''
     expects already setup Camera

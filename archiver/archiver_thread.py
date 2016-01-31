@@ -1,9 +1,5 @@
 from threads.abstract_thread import AbstractThread
-from camera.camera import Camera 
 from queue import Queue
-from microphone.microphone import _sentinelMic
-from datetime import datetime
-import time
 from archiver.snapshot_archiver import SnapshotArchiver
 from camera.camera import _sentinelCamera
 from pprint import pprint
@@ -19,11 +15,10 @@ class ArchiverThreadManager(AbstractThread):
         while self._running:
             queue_data = queue.get()
             pprint(queue_data is _sentinelCamera)
-            if queue_data is _sentinelCamera:
+            if queue_data is _sentinelCamera and busy == False:
                 busy = True
                 pprint('worked')
-                archive_name = archiver.archivePictures(pictures_directory)
+                archiver.archivePictures(pictures_directory)
                 archiver.cleanPictures()
-                _sentinel_archiver_to_emailer.archive_name = archive_name
                 queue.put(_sentinel_archiver_to_emailer) 
                 busy = False

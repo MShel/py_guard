@@ -2,6 +2,7 @@ from queue import Queue
 from datetime import datetime
 import os
 import zipfile
+from pprint import pprint
 # initialize the camera
 class SnapshotArchiver:
     
@@ -16,13 +17,14 @@ class SnapshotArchiver:
         ziped_file = zipfile.ZipFile(self.zfilename, 'w')
         for root, dirs, files in os.walk(pictures_directory):
             for file in files:
-                ziped_file.write(os.path.join(root, file))
-        
+                if not file.endswith('zip'):
+                    pprint(file)
+                    ziped_file.write(os.path.join(root, file))
+        self.cleanPictures()
         return self.zfilename
     
     def cleanPictures(self):
         for root, dirs, files in os.walk(self.pictures_directory):
             for file in files:
-                if not self.zfilename.endsWith('zip'):
-                    os.remove(self.pictures_directory+file.name)
-        
+                if not file.endswith('zip'):
+                    os.remove(self.pictures_directory+file)
