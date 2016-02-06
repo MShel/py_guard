@@ -17,7 +17,6 @@ class ArchiverThreadManager(AbstractThread):
             pprint(queue_data is _sentinelCamera)
             if queue_data is _sentinelCamera and busy == False:
                 busy = True
-                pprint('worked')
                 archiver.archivePictures(pictures_directory)
                 archiver.cleanPictures()
                 queue.put(_sentinel_archiver_to_emailer) 

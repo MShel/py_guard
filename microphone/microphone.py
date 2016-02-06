@@ -2,11 +2,11 @@ import pyaudio
 import struct
 import math
 from queue import Queue
+from sentinels import _sentinelMic
 '''
 lots of this class been taken from 
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
-_sentinelMic = object()
 
 class Mic:
     
