@@ -15,4 +15,4 @@ class SenderThreadManager(AbstractThread):
         while self._running:
             queue_data = queue.get()
             if queue_data is _sentinelArchiver:
-                mailer.send(_sentinelArchiver.archiveName)
+                mailer.sendLastArchive(_sentinelArchiver.archiveName)
