@@ -53,7 +53,7 @@ def main(argv):
         queue_for_everything = Queue()     
         mic = Mic(queue_for_everything)
        
-        archiver = SnapshotArchiver()
+        archiver = SnapshotArchiver(queue_for_everything)
         archiver_thread_manager = ArchiverThreadManager()
         archiver_thread = Thread(target=archiver_thread_manager.run,args=(archiver, queue_for_everything, './pictures/'))
         archiver_thread.start()    
