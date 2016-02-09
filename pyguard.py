@@ -4,15 +4,21 @@ import os
 from queue import Queue
 import re
 from threading import Thread
-from microphone.microphone import Mic
 from pprint import pprint
+
+from microphone.microphone import Mic
 from microphone.microphone_thread import MicrophoneThreadManager
+
 from camera.camera_thread import CameraThreadManager
 from camera.camera import Camera
-import time
+
 from archiver.snapshot_archiver import SnapshotArchiver
 from archiver.archiver_thread import ArchiverThreadManager
-from archiver import archiver_thread
+
+from sender.mailer import Mailer
+from sender.sender_thread import SenderThreadManager
+
+import time
 
 sys.path.insert(0, os.getcwd())
 
@@ -49,13 +55,14 @@ def main(argv):
                 
         '''
         need to spin the threads and get all the juzz up and running
+        probably need a sepsarate config parser and starter classes...?
         '''
         queue_for_everything = Queue()     
         mic = Mic(queue_for_everything)
        
         archiver = SnapshotArchiver(queue_for_everything)
         archiver_thread_manager = ArchiverThreadManager()
-        archiver_thread = Thread(target=archiver_thread_manager.run,args=(archiver, queue_for_everything, './pictures/'))
+        archiver_thread = Thread(target=archiver_thread_manager.run, args=(archiver, queue_for_everything, './pictures/'))
         archiver_thread.start()    
         
         mic_thread_manager = MicrophoneThreadManager()   
@@ -64,12 +71,16 @@ def main(argv):
        
         camera = Camera(queue_for_everything)
         camera_thread_manager = CameraThreadManager()   
-        camera_thread = Thread(target=camera_thread_manager.run, args=(camera,queue_for_everything))
+        camera_thread = Thread(target=camera_thread_manager.run, args=(camera, queue_for_everything))
         camera_thread.start()
        
-
+        mailer = Mailer(queue_for_everything,'./pictures','mishash@list.ru','pyGuard name','pyGuard@localhost.com')
+        sender_thread_manager = SenderThreadManager()
+        sender_thread = Thread(target=sender_thread_manager.run, args=(mailer, queue_for_everything))
+        sender_thread.start()
       
         '''
+        queue: Queue, pictures_directory: str, emailTo: str, subject: str, emailFrom: str
         time.sleep(15)
         mic_thread_manager.stop()
         camera_thread_manager.stop()
@@ -77,28 +88,15 @@ def main(argv):
         microphone_thread.join()
         '''
         
-    except getopt.GetoptError:
-        print('test1')
-        sys.exit(2)
-    except PermissionError:
-        print('test1')
+    except (getopt.GetoptError, IndexError, ImportError) as e:
+        print(e)
         sys.exit(2)
     except Exception as e:
         print(e)
         sys.exit(2)
-    except IndexError:
-        print('test1')
-        sys.exit(2)
     except KeyboardInterrupt:
-
         print('????test')
         sys.exit(1)
-    ''''
-    except ImportError:
-        sys.exit(2)    
-    '''
-
-        
     
 if __name__ == "__main__":
     main(sys.argv[1:])
