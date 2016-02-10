@@ -2,11 +2,21 @@
 
 So The plan is to implement multiThread system
 
-* Thread One - Listen to microphone stuff(for the N db) -> write to Queue1... and keep listening 
-* Thread Two - Checking Queue1 for an event -> turn on camera take N pictures put them to Queue2 
-* Thread Three - Checking Queue2 for pictures receive them and pack in gzip put it in Queue3
-* Thread Four - Checking Queue3 for gzip, send to an email
+* Thread One - Listen to microphone stuff(for the N db) -> write to Queue, and keep listening 
+* Thread Two - Checking Queue for an _microphone_sentinel -> turn on camera take N pictures put them to archive -> and write _camera_sentinel 
+* Thread Three - Checking Queue for _camera_sentinel  pack all pictures in zip put _archiver_sentinel and archive name into queue
+* Thread Four - Checking queue for _archiver_sentinel get the archive name connect to remote smptp and send it
 
 ## Required Libraries:
 * pyaudio
 * OpenCv (instructions: http://www.pyimagesearch.com/2015/07/20/install-opencv-3-0-and-python-3-4-on-ubuntu/)
+
+## Required Things:
+* linux(tested on ubuntu)
+* microphone
+* camera
+* credentials to any remote smptp server(gmail?)
+* email address
+* 
+
+
