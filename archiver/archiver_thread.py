@@ -16,5 +16,6 @@ class ArchiverThreadManager(AbstractThread):
             pprint(queue_data is _sentinelCamera)
             if queue_data is _sentinelCamera and busy == False:
                 busy = True
+                print('archiving')
                 archiver.archivePictures(pictures_directory)
                 busy = False

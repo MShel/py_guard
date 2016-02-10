@@ -73,12 +73,11 @@ def main(argv):
         camera_thread_manager = CameraThreadManager()   
         camera_thread = Thread(target=camera_thread_manager.run, args=(camera, queue_for_everything))
         camera_thread.start()
-       
-        mailer = Mailer(queue_for_everything,'./pictures','mishash@list.ru','pyGuard name','pyGuard@localhost.com')
+        mailer = Mailer(queue_for_everything,'./pictures/','mshelemetev@gmail.com','pyGuard name','pyGuard@localhost.com')
         sender_thread_manager = SenderThreadManager()
         sender_thread = Thread(target=sender_thread_manager.run, args=(mailer, queue_for_everything))
         sender_thread.start()
-      
+    
         '''
         queue: Queue, pictures_directory: str, emailTo: str, subject: str, emailFrom: str
         time.sleep(15)

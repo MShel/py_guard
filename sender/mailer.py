@@ -3,7 +3,8 @@ import os
 import smtplib
 import mimetypes
 from email import encoders
-from email.mime.multipart import *
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 from sentinels import _sentinelSender
 
 # initialize the camera
@@ -15,17 +16,20 @@ class Mailer:
         self.emailTo = emailTo
         self.subject = subject
         self.emailFrom = emailFrom
+        self.server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+        self.server.ehlo()
+        self.server.login('mshelemetev@gmail.com', '***************')
         
     def sendLastArchive(self, archiveName: str):
         result = False
         # Create the container (outer) email message.
-        if os.path.isfile(self.pictures_directory, archiveName):
+        path =  os.path.join(archiveName)
+        if os.path.isfile(path):
             outer = MIMEMultipart()
             outer['Subject'] = self.subject
             outer['From'] = self.emailFrom
             outer['To'] = self.emailTo
             outer.preamble = self.subject
-            path =  os.path.join(self.pictures_directory, archiveName)
             ctype, encoding = mimetypes.guess_type(path)
             maintype, subtype = ctype.split('/', 1)
             with open(path,'rb') as fp:
@@ -34,11 +38,11 @@ class Mailer:
                 encoders.encode_base64(msg)
                 msg.add_header('Content-Disposition', 'attachment', filename=archiveName)
             outer.attach(msg)
-           
-            with smtplib.SMTP('localhost') as s:
-                result = s.sendmail(self.emailFrom, self.EmailTo, outer.as_string())      
-            
+            result = self.server.sendmail(self.emailFrom, self.emailTo, outer.as_string())      
+            self.server.close()
             self.queue.put(_sentinelSender)
+        else:
+            print(archiveName)
         return result
     
     def sendAll(self):
@@ -46,3 +50,5 @@ class Mailer:
             for file in files:
                 if file.endswith('zip'):
                     os.remove(self.pictures_directory + file)
+
+

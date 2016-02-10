@@ -9,7 +9,7 @@ class CameraThreadManager(AbstractThread):
     
     def __init__(self):
         AbstractThread.__init__(self)
-        self.pictures_amount = 5
+        self.pictures_amount = 1
         self.taps_count = 2
         self.pictures_directory = './pictures/'
     '''

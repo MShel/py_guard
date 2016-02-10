@@ -22,10 +22,10 @@ class SnapshotArchiver:
                 if not file.endswith('zip'):
                     ziped_file.write(os.path.join(root, file))
         self.cleanPictures()
-        sentinel_archiver = _sentinelArchiver(self.zfilename)
-        self.queue.put(sentinel_archiver)
-
-        return self.zfilename
+        #sentinel_archiver = _sentinelArchiver(self.zfilename)
+        #print('putting sent archive')
+        self.queue.put(_sentinelArchiver)
+        self.queue.put(self.zfilename)
     
     def cleanPictures(self):
         for root, dirs, files in os.walk(self.pictures_directory):
