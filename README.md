@@ -17,6 +17,5 @@ So The plan is to implement multiThread system
 * camera
 * credentials to any remote smptp server(gmail?)
 * email address
-* 
 
 
