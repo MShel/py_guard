@@ -1,7 +1,6 @@
 from threads.abstract_thread import AbstractThread
 from queue import Queue
-from pprint import pprint
-from sentinels import _sentinelArchiver
+from sentinels import Sentinel
 
 
 class SenderThreadManager(AbstractThread):
@@ -13,8 +12,8 @@ class SenderThreadManager(AbstractThread):
     def run(self, mailer, queue: Queue):
         while self._running:
             queue_data = queue.get()
-            if queue_data is _sentinelArchiver:
+            if queue_data.getAction() == Sentinel.senderAction:
                 print('sending email')
-                archive_to_send = str(queue.get())
+                archive_to_send = queue.get_meta()
                 print(archive_to_send)
                 mailer.sendLastArchive(archive_to_send)

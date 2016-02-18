@@ -2,7 +2,7 @@ from queue import Queue
 from datetime import datetime
 import os
 import zipfile
-from sentinels import _sentinelArchiver
+from sentinels import Sentinel
 
 # initialize the camera
 class SnapshotArchiver:
@@ -22,10 +22,8 @@ class SnapshotArchiver:
                 if not file.endswith('zip'):
                     ziped_file.write(os.path.join(root, file))
         self.cleanPictures()
-        #sentinel_archiver = _sentinelArchiver(self.zfilename)
-        #print('putting sent archive')
-        self.queue.put(_sentinelArchiver)
-        self.queue.put(self.zfilename)
+        sentinel = Sentinel(datetime.now(), Sentinel.senderAction, self.zfilename)
+        self.queue.put(sentinel)
     
     def cleanPictures(self):
         for root, dirs, files in os.walk(self.pictures_directory):

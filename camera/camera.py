@@ -1,6 +1,6 @@
 from cv2 import *
 from datetime import datetime
-from sentinels import _sentinelCamera
+from sentinels import Sentinel
 # initialize the camera
 class Camera:
     
@@ -14,11 +14,13 @@ class Camera:
             s, img = self.camera.read()
             if s:  # frame captured without any errors
                 waitKey(30)
-                imwrite(pictures_directory + str(datetime.today()) + ".jpg", img)  # save image
+                picturePath = pictures_directory + str(datetime.today()) + ".jpg"
+                imwrite(picturePath, img)  # save image
                 self.pictures_taken += 1
                 
                 if self.pictures_taken == pictures_amount:
-                    self.queue.put(_sentinelCamera)
+                    sentinel = Sentinel(datetime.now(), Sentinel.archiveAction, picturePath)
+                    self.queue.put(sentinel)
                     self.pictures_taken = 0
                 
                

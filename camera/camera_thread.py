@@ -1,8 +1,7 @@
 from threads.abstract_thread import AbstractThread
 from camera.camera import Camera 
 from queue import Queue
-from microphone.microphone import _sentinelMic
-from pprint import pprint
+from sentinels import Sentinel
 
 
 class CameraThreadManager(AbstractThread):
@@ -12,6 +11,7 @@ class CameraThreadManager(AbstractThread):
         self.pictures_amount = 1
         self.taps_count = 2
         self.pictures_directory = './pictures/'
+    
     '''
     expects already setup Camera
     taps_count amount of taps  before picture is taken
@@ -26,7 +26,7 @@ class CameraThreadManager(AbstractThread):
         
         while self._running:
             queue_data = queue.get()
-            if queue_data is _sentinelMic:
+            if queue_data.getAction == Sentinel.microphoneAction:
                 taps += 1
                 if taps == taps_count:
                     cam.takeNPictures(1, pictures_directory, pictures_amount)
