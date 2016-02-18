@@ -1,7 +1,7 @@
 from threads.abstract_thread import AbstractThread
 from queue import Queue
 from archiver.snapshot_archiver import SnapshotArchiver
-from sentinels import _sentinelCamera
+from sentinels import Sentinel
 from pprint import pprint
 
 class ArchiverThreadManager(AbstractThread):
@@ -13,8 +13,7 @@ class ArchiverThreadManager(AbstractThread):
         busy = False
         while self._running:
             queue_data = queue.get()
-            pprint(queue_data is _sentinelCamera)
-            if queue_data is _sentinelCamera and busy == False:
+            if queue_data.get_action() == Sentinel.archiveAction and busy == False:
                 busy = True
                 archiver.archivePictures(pictures_directory)
                 busy = False

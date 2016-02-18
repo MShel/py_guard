@@ -2,12 +2,13 @@ import pyaudio
 import struct
 import math
 from queue import Queue
-from sentinels import _sentinelMic
+from sentinels import Sentinel
+from datetime import datetime
+
 '''
 lots of this class been taken from 
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
-
 class Mic:
     
     
@@ -76,7 +77,8 @@ class Mic:
                 self.tap_threshold *= 1.1  # turn down the sensitivity
         else:  # if its to quiet...
             if 1 <= self.noisy_count <= self.MAX_TAP_BLOCKS:
-                self.queue.put(_sentinelMic)
+                sentinel = Sentinel(datetime.now(),Sentinel.microphoneAction,'mic dropped')
+                self.queue.put(sentinel)
             self.noisy_count = 0
             self.quiet_count += 1
             
