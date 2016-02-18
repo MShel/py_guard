@@ -36,6 +36,3 @@ class Sentinel:
         self._dateCreated = self._dateCreated.isoformat()
         return dumps(self, default=lambda o: o.__dict__,
             sort_keys=True, indent=4)
-    
-test = Sentinel('test', datetime.now(), 'action', 'some meta')
-print(test)
