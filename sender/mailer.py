@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from sentinels import _sentinelSender
 
-# initialize the camera
+# initailize email
 class Mailer:
     
     def __init__(self, queue: Queue, pictures_directory: str, emailTo: str, subject: str, emailFrom: str):
@@ -49,6 +49,8 @@ class Mailer:
         for root, dirs, files in os.walk(self.pictures_directory):
             for file in files:
                 if file.endswith('zip'):
+                    filePath = self.pictures_directory + file
+                    self.sendLastArchive(filePath)
                     os.remove(self.pictures_directory + file)
 
 
