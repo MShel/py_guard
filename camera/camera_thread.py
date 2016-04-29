@@ -26,7 +26,7 @@ class CameraThreadManager(AbstractThread):
         
         while self._running:
             queue_data = queue.get()
-            if queue_data.getAction == Sentinel.microphoneAction:
+            if queue_data.get_action() == Sentinel.microphoneAction:
                 taps += 1
                 if taps == taps_count:
                     cam.takeNPictures(1, pictures_directory, pictures_amount)

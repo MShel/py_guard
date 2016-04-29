@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from json import dumps
 
 class Sentinel:
@@ -15,7 +15,7 @@ class Sentinel:
     _meta something we might need to transfer to other resources
     _action is property that we check for 
     '''
-    def __init__(self, dateCreated :datetime, action :str, meta :str):
+    def __init__(self, dateCreated : datetime.datetime, action :str, meta :str):
         self._dateCreated = dateCreated
         self._action = action
         self._meta = meta
@@ -23,7 +23,7 @@ class Sentinel:
     def get_name(self):
         return self._sentinelName
     
-    def get_action(self):
+    def get_action(self) -> object:
         return self._action
     
     def get_dateCreated(self):
