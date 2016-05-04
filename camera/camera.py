@@ -10,7 +10,7 @@ class Camera:
         self.queue = queue
     
     def takeNPictures(self, n: int, pictures_directory: str, pictures_amount: int):
-        for i in (0, n):    
+        for i in (0, n):
             s, img = self.camera.read()
             if s:  # frame captured without any errors
                 waitKey(30)
@@ -22,6 +22,3 @@ class Camera:
                     sentinel = Sentinel(datetime.now(), Sentinel.archiveAction, picturePath)
                     self.queue.put(sentinel)
                     self.pictures_taken = 0
-                
-               
-                

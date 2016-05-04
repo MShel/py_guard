@@ -28,11 +28,12 @@ def main(argv):
         '''
          options:
           --email=test@test.com .. you should have mail server setup
-          or later I'll implement some ssl encrypted communication with my server which will push stuff there process and send to an email specified
+          or later I'll implement some ssl encrypted communication with my server which will
+          push stuff there process and send to an email specified
           ...
-          
-          Another option 
-          
+
+          Another option
+
           --dblevel=20 noise level
          '''
 
@@ -49,8 +50,8 @@ def main(argv):
                 db_level = arg
 
         '''
-        need to spin the threads and get all the juzz up and running
-        probably need a sepsarate config parser and starter classes...?
+        need to spin the threads and get all the jazz up and running
+        probably need a separate config parser and starter classes...?
         '''
         queue_for_everything = Queue()
         mic = Mic(queue_for_everything)

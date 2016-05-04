@@ -6,7 +6,7 @@ from sentinels import Sentinel
 from datetime import datetime
 
 '''
-lots of this class been taken from 
+most of this class been taken from
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
 
