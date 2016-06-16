@@ -10,17 +10,17 @@ from queue import Queue
 from sentinels import Sentinel
 
 
-# initailize email
+# initialize email
 class Mailer:
-    def __init__(self, queue: Queue, pictures_directory: str, emailTo: str, subject: str, emailFrom: str):
+    def __init__(self, queue: Queue, config_object: dict):
         self.queue = queue
-        self.pictures_directory = pictures_directory
-        self.emailTo = emailTo
-        self.subject = subject
-        self.emailFrom = emailFrom
-        self.server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+        self.pictures_directory = config_object["FILES"]["pictures_directory"]
+        self.emailTo = config_object["EMAILS"]["email"]
+        self.subject = config_object["EMAILS"]["title"]
+        self.emailFrom = config_object["EMAILS"]["pyGuard@localhost"]
+        self.server = smtplib.SMTP_SSL(config_object["EMAILS"]["server_address"], config_object["EMAILS"]["port"])
         self.server.ehlo()
-        self.server.login('mshelemetev@gmail.com', '**')
+        self.server.login(config_object["EMAILS"]["email"], config_object["EMAILS"]["password"])
 
     def send_last_archive(self, archive_name: object) -> object:
         result = False
