@@ -1,9 +1,11 @@
-import pyaudio
-import struct
 import math
-from queue import Queue
-from sentinels import Sentinel
+import struct
 from datetime import datetime
+from queue import Queue
+
+import pyaudio
+
+from sentinels import Sentinel
 
 '''
 most of this class been taken from
@@ -32,14 +34,15 @@ class Mic:
 
     MAX_TAP_BLOCKS = 0.15 / INPUT_BLOCK_TIME
 
-    def __init__(self, queue: Queue):
+    def __init__(self, queue: Queue, config_object: dict):
         py_audio = pyaudio.PyAudio()
         self.stream = py_audio.open(format=self.FORMAT,
                                     channels=self.CHANNELS,
                                     rate=self.RATE,
                                     input=True,
                                     frames_per_buffer=self.INPUT_FRAMES_PER_BLOCK)
-        self.tap_threshold = self.INITIAL_TAP_THRESHOLD
+        self.tap_threshold = float(config_object['MICROPHONE']["tap_treshhold"])
+        self.INPUT_BLOCK_TIME = float(config_object['MICROPHONE']["INPUT_BLOCK_TIME"])
         self.noisy_count = self.MAX_TAP_BLOCKS + 1
         self.quiet_count = 0
         self.queue = queue
