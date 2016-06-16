@@ -1,19 +1,20 @@
-from threads.abstract_thread import AbstractThread
 from queue import Queue
+
 from archiver.snapshot_archiver import SnapshotArchiver
 from sentinels import Sentinel
-from pprint import pprint
+from threads.abstract_thread import AbstractThread
+
 
 class ArchiverThreadManager(AbstractThread):
-    
     '''
     expects already setup Mic
     '''
-    def run(self, archiver: SnapshotArchiver, queue: Queue, pictures_directory='./pictures/'):
+
+    def run(self, archiver: SnapshotArchiver, queue: Queue):
         busy = False
         while self._running:
             queue_data = queue.get()
-            if queue_data.get_action() == Sentinel.archiveAction and busy == False:
+            if queue_data.get_action() == Sentinel.archiveAction and busy is False:
                 busy = True
-                archiver.archivePictures(pictures_directory)
+                archiver.archivePictures()
                 busy = False

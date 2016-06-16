@@ -6,45 +6,45 @@ from sentinels import Sentinel
 from datetime import datetime
 
 '''
-lots of this class been taken from 
+most of this class been taken from
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
+
+
 class Mic:
-    
-    
     INITIAL_TAP_THRESHOLD = 0.010
-    
-    FORMAT = pyaudio.paInt16 
-    
+
+    FORMAT = pyaudio.paInt16
+
     SHORT_NORMALIZE = (1.0 / 32768.0)
-    
+
     CHANNELS = 2
-    
-    RATE = 44100  
-    
+
+    RATE = 44100
+
     INPUT_BLOCK_TIME = 0.05
-    
+
     INPUT_FRAMES_PER_BLOCK = int(RATE * INPUT_BLOCK_TIME)
 
-    OVERSENSITIVE = 15.0 / INPUT_BLOCK_TIME                    
+    OVERSENSITIVE = 15.0 / INPUT_BLOCK_TIME
 
     UNDERSENSITIVE = 120.0 / INPUT_BLOCK_TIME
 
-    MAX_TAP_BLOCKS = 0.15 / INPUT_BLOCK_TIME  
-   
+    MAX_TAP_BLOCKS = 0.15 / INPUT_BLOCK_TIME
+
     def __init__(self, queue: Queue):
-        py_audio = pyaudio.PyAudio() 
+        py_audio = pyaudio.PyAudio()
         self.stream = py_audio.open(format=self.FORMAT,
-            channels=self.CHANNELS,
-            rate=self.RATE,
-            input=True,
-            frames_per_buffer=self.INPUT_FRAMES_PER_BLOCK)  
-        self.tap_threshold = self.INITIAL_TAP_THRESHOLD 
-        self.noisy_count = self.MAX_TAP_BLOCKS + 1 
-        self.quiet_count = 0 
+                                    channels=self.CHANNELS,
+                                    rate=self.RATE,
+                                    input=True,
+                                    frames_per_buffer=self.INPUT_FRAMES_PER_BLOCK)
+        self.tap_threshold = self.INITIAL_TAP_THRESHOLD
+        self.noisy_count = self.MAX_TAP_BLOCKS + 1
+        self.quiet_count = 0
         self.queue = queue
         self.error_count = 0
-        
+
     def get_rms(self, block):
         count = len(block) / 2
         formatConvertWave = "%dh" % (count)
@@ -67,9 +67,9 @@ class Mic:
             self.error_count += 1  # |
             print("(%d) Error recording: %s" % (self.errorcount, e))  # |
             self.noisy_count = 1  # ]
-        
+
         amplitude = self.get_rms(block)
-        
+
         if amplitude > self.tap_threshold:  # if its to loud...
             self.quiet_count = 0
             self.noisy_count += 1
@@ -77,11 +77,11 @@ class Mic:
                 self.tap_threshold *= 1.1  # turn down the sensitivity
         else:  # if its to quiet...
             if 1 <= self.noisy_count <= self.MAX_TAP_BLOCKS:
-                sentinel = Sentinel(datetime.now(),Sentinel.microphoneAction,'mic dropped')
+                sentinel = Sentinel(datetime.now(), Sentinel.microphoneAction, 'mic dropped')
                 self.queue.put(sentinel)
             self.noisy_count = 0
             self.quiet_count += 1
-            
+
             if self.quiet_count > self.UNDERSENSITIVE:
                 self.tap_threshold *= 0.9  # turn up the sensitivity
         return
