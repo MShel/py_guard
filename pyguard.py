@@ -44,15 +44,17 @@ def main():
         microphone_thread = Thread(target=mic_thread_manager.run, args=(mic,))
         microphone_thread.start()
 
-        camera = Camera(queue_for_everything, config_object)
-        camera_thread_manager = CameraThreadManager()
-        camera_thread = Thread(target=camera_thread_manager.run, args=(camera, queue_for_everything))
-        camera_thread.start()
+        camera = Camera(config_object)
+        '''
+        tell camera to take some pictures...
+        '''
+        camera_res = camera.send({'action':'photos'})
 
-        mailer = Mailer(queue_for_everything, config_object)
-        sender_thread_manager = SenderThreadManager()
-        sender_thread = Thread(target=sender_thread_manager.run, args=(mailer, queue_for_everything))
-        sender_thread.start()
+        if camera_res == 'done':
+            mailer = Mailer(queue_for_everything, config_object)
+            sender_thread_manager = SenderThreadManager()
+            sender_thread = Thread(target=sender_thread_manager.run, args=(mailer, queue_for_everything))
+            sender_thread.start()
 
     except (getopt.GetoptError, IndexError, ImportError) as e:
         print(e)

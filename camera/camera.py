@@ -19,8 +19,10 @@ class Camera:
             args = (yield)
             if args['action'] == 'photos':
                 self.take_some_pictures()
+                yield 'done'
             elif args['action'] == 'video':
                 self.record_some_video()
+                yield 'done'
             else:
                 print("Invalid action")
 
@@ -61,7 +63,7 @@ class Camera:
     proxy to couroutine
     '''
     def send(self,**kwargs):
-        self.camera_action.send(kwargs)
+       return self.camera_action.send(kwargs)
 
     '''
     close running coroutine
