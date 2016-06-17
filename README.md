@@ -1,5 +1,7 @@
 # py_guard
 
+[![Coverage Status](https://coveralls.io/repos/github/MShel/py_guard/badge.svg?branch=develop)](https://coveralls.io/github/MShel/py_guard?branch=develop)
+
 So The plan is to implement multiThread system
 
 * Thread One - Listen to microphone stuff(for the N db) -> write to Queue, and keep listening 
