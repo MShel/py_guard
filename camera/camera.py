@@ -1,7 +1,7 @@
 from cv2 import *
 from datetime import datetime
 from threading import Timer
-
+from asyncio import coroutine
 
 # initialize the camera
 class Camera:
@@ -12,6 +12,7 @@ class Camera:
         self.pictures_amount = int(config_object["CAMERA"]["pictures_amount"])
         self.video_time_interval = int(config_object["CAMERA"]["video_interval"])
         self.camera_action = self._camera_action()
+        self._camera_action.send(None)
 
     @coroutine
     def _camera_action(self):
