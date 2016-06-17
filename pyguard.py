@@ -1,20 +1,13 @@
 #!/usr/bin/env python
-import getopt
 import os
 import subprocess
 import sys
-from queue import Queue
-from threading import Thread
 
-from archiver.archiver_thread import ArchiverThreadManager
-from archiver.snapshot_archiver import SnapshotArchiver
 from camera.camera import Camera
-from camera.camera_thread import CameraThreadManager
 from config.config import Config
 from microphone.microphone import Mic
-from microphone.microphone_thread import MicrophoneThreadManager
+from archiver.archiver import Archiver
 from sender.mailer import Mailer
-from sender.sender_thread import SenderThreadManager
 
 sys.path.insert(0, os.getcwd())
 
@@ -32,30 +25,21 @@ def main():
         probably need a separate config parser and starter classes...?
         '''
         mic = Mic(config_object)
-        #tell mic to listen...
-        mic.send({'action':'listen'})
         camera = Camera(config_object)
-        #tell camera to take some pictures...
-        camera_res = camera.send({'action':'photos'})
+        archiver = Archiver(config_object)
+        mailer = Mailer(config_object)
 
-        queue_for_everything = Queue()
-        archiver = SnapshotArchiver(queue_for_everything, config_object)
-        archiver_thread_manager = ArchiverThreadManager()
-        archiver_thread = Thread(target=archiver_thread_manager.run,
-                                 args=(archiver, queue_for_everything))
-        archiver_thread.start()
+        while True:
+            # tell mic to listen...
+            mic_response = mic.send({'action':'listen'})
+            #we need to make sure we are not waiting for stuff here...
+            if mic_response ==  mic.MIC_DONE:
+                camera_res = camera.send({'action': 'photos'})
+                if camera_res == camera.CAMERA_DONE:
+                    archiver_res = archiver.send({'action':'archive'})
+                    if archiver_res == archiver.ARCHIVER_DONE and archiver.zfilename is not None:
+                        mailer.send({'action':'last','last_archive_name':archiver.zfilename})
 
-        mic_thread_manager = MicrophoneThreadManager()
-        microphone_thread = Thread(target=mic_thread_manager.run, args=(mic,))
-        microphone_thread.start()
-
-
-
-        if camera_res == camera.CAMERA_DONE:
-            mailer = Mailer(queue_for_everything, config_object)
-            sender_thread_manager = SenderThreadManager()
-            sender_thread = Thread(target=sender_thread_manager.run, args=(mailer, queue_for_everything))
-            sender_thread.start()
 
     except LookupError as e:
         print(e)
@@ -65,6 +49,8 @@ def main():
         print('keyboard interruption')
         camera.close()
         mic.close()
+        archiver.close()
+        mailer.close()
         sys.exit(1)
 
 

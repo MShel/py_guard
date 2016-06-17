@@ -19,7 +19,7 @@ class Camera:
         self.camera_action.send(None)
 
     @coroutine
-    def _camera_action(self) -> str:
+    def _camera_action(self):
         while True:
             args = (yield)
             if args['action'] == 'photos':

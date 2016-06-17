@@ -2,18 +2,17 @@ import email.mime.multipart
 import mimetypes
 import os
 import smtplib
-from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
-from queue import Queue
-
-from sentinels import Sentinel
+from asyncio import coroutine
 
 
 # initialize email
 class Mailer:
-    def __init__(self, queue: Queue, config_object: dict):
-        self.queue = queue
+    #value to return
+    MAILER_DONE = 'mailer_done'
+
+    def __init__(self, config_object: dict):
         self.pictures_directory = config_object["FILES"]["pictures_directory"]
         self.emailTo = config_object["EMAILS"]["email"]
         self.subject = config_object["EMAILS"]["title"]
@@ -21,9 +20,25 @@ class Mailer:
         self.server = smtplib.SMTP_SSL(config_object["EMAILS"]["server_address"], config_object["EMAILS"]["port"])
         self.server.ehlo()
         self.server.login(config_object["EMAILS"]["email"], config_object["EMAILS"]["password"])
+        self.mailer_action = self._mailer_action()
+         # need send None to get to the first yield
+        self.mailer_action.send(None)
+
+    @coroutine
+    def _mailer_action(self):
+        while True:
+            args = (yield)
+            if args['action'] == 'last':
+                if args['last_archive_name']:
+                    self.send_last_archive(args['last_archive_name'])
+                yield self.MAILER_DONE
+            elif args['action'] == 'all':
+                self.send_all()
+                yield self.MAILER_DONE
+            else:
+                raise LookupError('Invalid mailer action')
 
     def send_last_archive(self, archive_name: object) -> object:
-        result = False
         # Create the container (outer) email message.
         path = os.path.join(archive_name)
         if os.path.isfile(path):
@@ -42,12 +57,6 @@ class Mailer:
             outer.attach(msg)
             self.server.sendmail(self.emailFrom, self.emailTo, outer.as_string())
             self.server.close()
-            sentinel = Sentinel(datetime.now(), Sentinel.senderAction, 'mail sent')
-            self.queue.put(sentinel)
-            result = True
-        else:
-            print(archive_name)
-        return result
 
     def send_all(self):
         for root, dirs, files in os.walk(self.pictures_directory):
@@ -56,3 +65,15 @@ class Mailer:
                     file_path = self.pictures_directory + file
                     self.send_last_archive(file_path)
                     os.remove(self.pictures_directory + file)
+
+    '''
+    proxy to couroutine
+    '''
+    def send(self, **kwargs):
+        return self.mailer_action.send(kwargs)
+
+    '''
+    close running coroutine
+    '''
+    def close(self):
+        self.mailer_action.close()

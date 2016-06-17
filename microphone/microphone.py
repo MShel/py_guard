@@ -49,7 +49,7 @@ class Mic:
         self.mic_action.send(None)
 
     @coroutine
-    def _mic_action(self)-> str:
+    def _mic_action(self):
         while True:
             args = (yield)
             if args['action'] == 'listen':
