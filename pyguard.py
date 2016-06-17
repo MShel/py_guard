@@ -31,9 +31,14 @@ def main():
         need to spin the threads and get all the jazz up and running
         probably need a separate config parser and starter classes...?
         '''
-        queue_for_everything = Queue()
-        mic = Mic(queue_for_everything, config_object)
+        mic = Mic(config_object)
+        #tell mic to listen...
+        mic.send({'action':'listen'})
+        camera = Camera(config_object)
+        #tell camera to take some pictures...
+        camera_res = camera.send({'action':'photos'})
 
+        queue_for_everything = Queue()
         archiver = SnapshotArchiver(queue_for_everything, config_object)
         archiver_thread_manager = ArchiverThreadManager()
         archiver_thread = Thread(target=archiver_thread_manager.run,
@@ -44,11 +49,7 @@ def main():
         microphone_thread = Thread(target=mic_thread_manager.run, args=(mic,))
         microphone_thread.start()
 
-        camera = Camera(config_object)
-        '''
-        tell camera to take some pictures...
-        '''
-        camera_res = camera.send({'action':'photos'})
+
 
         if camera_res == camera.CAMERA_DONE:
             mailer = Mailer(queue_for_everything, config_object)
@@ -56,14 +57,14 @@ def main():
             sender_thread = Thread(target=sender_thread_manager.run, args=(mailer, queue_for_everything))
             sender_thread.start()
 
-    except (getopt.GetoptError, IndexError, ImportError) as e:
+    except LookupError as e:
         print(e)
         sys.exit(2)
-    except Exception as e:
-        print(e)
-        sys.exit(2)
+
     except KeyboardInterrupt:
-        print('????test')
+        print('keyboard interruption')
+        camera.close()
+        mic.close()
         sys.exit(1)
 
 

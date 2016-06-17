@@ -1,19 +1,14 @@
 import math
 import struct
-from datetime import datetime
-from queue import Queue
-
 import pyaudio
-
-from sentinels import Sentinel
+from asyncio import coroutine
 
 '''
 most of this class been taken from
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
-
-
 class Mic:
+
     INITIAL_TAP_THRESHOLD = 0.010
 
     FORMAT = pyaudio.paInt16
@@ -34,7 +29,9 @@ class Mic:
 
     MAX_TAP_BLOCKS = 0.15 / INPUT_BLOCK_TIME
 
-    def __init__(self, queue: Queue, config_object: dict):
+    MIC_DONE = 'mic_done'
+
+    def __init__(self,  config_object: dict):
         py_audio = pyaudio.PyAudio()
         self.stream = py_audio.open(format=self.FORMAT,
                                     channels=self.CHANNELS,
@@ -47,6 +44,19 @@ class Mic:
         self.quiet_count = 0
         self.queue = queue
         self.error_count = 0
+        self.mic_action = self._mic_action()
+        # need send None to get to the first yield
+        self.mic_action.send(None)
+
+    @coroutine
+    def _mic_action(self)-> str:
+        while True:
+            args = (yield)
+            if args['action'] == 'listen':
+                if self.listen() is True:
+                    yield self.MIC_TAP_REGISTERED
+            else:
+                raise LookupError('Invalid microphone action')
 
     def get_rms(self, block):
         count = len(block) / 2
@@ -64,6 +74,7 @@ class Mic:
         return math.sqrt(sum_squares / count)
 
     def listen(self):
+        result = False
         try:
             block = self.stream.read(self.INPUT_FRAMES_PER_BLOCK)  # |
         except IOError as e:  # |---- just in case there is an error!
@@ -80,11 +91,22 @@ class Mic:
                 self.tap_threshold *= 1.1  # turn down the sensitivity
         else:  # if its to quiet...
             if 1 <= self.noisy_count <= self.MAX_TAP_BLOCKS:
-                sentinel = Sentinel(datetime.now(), Sentinel.microphoneAction, 'mic dropped')
-                self.queue.put(sentinel)
+                result = True
             self.noisy_count = 0
             self.quiet_count += 1
 
             if self.quiet_count > self.UNDERSENSITIVE:
                 self.tap_threshold *= 0.9  # turn up the sensitivity
-        return
+        yield result
+
+    '''
+    proxy to couroutine
+    '''
+    def send(self, **kwargs):
+        return self.mic_action.send(kwargs)
+
+    '''
+    close running coroutine
+    '''
+    def close(self):
+        self.mic_action.close()

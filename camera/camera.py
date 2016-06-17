@@ -15,10 +15,11 @@ class Camera:
         self.pictures_amount = int(config_object["CAMERA"]["pictures_amount"])
         self.video_time_interval = int(config_object["CAMERA"]["video_interval"])
         self.camera_action = self._camera_action()
-        self._camera_action.send(None)
+        # need send None to get to the first yield
+        self.camera_action.send(None)
 
     @coroutine
-    def _camera_action(self):
+    def _camera_action(self) -> str:
         while True:
             args = (yield)
             if args['action'] == 'photos':
@@ -28,7 +29,7 @@ class Camera:
                 self.record_some_video()
                 yield self.CAMERA_DONE
             else:
-                print("Invalid action")
+                raise LookupError('Invalid camera action')
 
     def take_some_pictures(self):
         for i in range(0, self.pictures_amount + 1):
@@ -50,9 +51,8 @@ class Camera:
         video_timer.start()
         while self.camera.isOpened() and video_timer.finished.is_set() is True:
             ret, frame = self.camera.read()
-            if ret == True:
+            if ret is True:
                 frame = cv2.flip(frame, 0)
-                # write the flipped frame
                 out.write(frame)
                 self.camera.release()
                 out.release()
@@ -73,4 +73,4 @@ class Camera:
     close running coroutine
     '''
     def close(self):
-        self.takeNPictures.close()
+        self.camera_action.close()
