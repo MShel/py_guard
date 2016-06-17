@@ -5,6 +5,9 @@ from asyncio import coroutine
 
 # initialize the camera
 class Camera:
+    #value to return
+    CAMERA_DONE = 'cam_done'
+
     def __init__(self, config_object: dict):
         self.pictures_taken = 0
         self.camera = VideoCapture(0)
@@ -20,10 +23,10 @@ class Camera:
             args = (yield)
             if args['action'] == 'photos':
                 self.take_some_pictures()
-                yield 'done'
+                yield self.CAMERA_DONE
             elif args['action'] == 'video':
                 self.record_some_video()
-                yield 'done'
+                yield self.CAMERA_DONE
             else:
                 print("Invalid action")
 
@@ -69,5 +72,5 @@ class Camera:
     '''
     close running coroutine
     '''
-    def close(self)
+    def close(self):
         self.takeNPictures.close()

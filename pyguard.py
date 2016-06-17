@@ -50,7 +50,7 @@ def main():
         '''
         camera_res = camera.send({'action':'photos'})
 
-        if camera_res == 'done':
+        if camera_res == camera.CAMERA_DONE:
             mailer = Mailer(queue_for_everything, config_object)
             sender_thread_manager = SenderThreadManager()
             sender_thread = Thread(target=sender_thread_manager.run, args=(mailer, queue_for_everything))
