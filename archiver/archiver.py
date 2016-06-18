@@ -44,8 +44,8 @@ class Archiver:
     '''
     proxy to couroutine
     '''
-    def send(self, **kwargs):
-        return self.archiver_action.send(kwargs)
+    def send(self, action_dict: dict):
+        return self.archiver_action.send(action_dict)
 
     '''
     close running coroutine

@@ -1,14 +1,16 @@
 import math
 import struct
-import pyaudio
 from asyncio import coroutine
+
+import pyaudio
 
 '''
 most of this class been taken from
 http://stackoverflow.com/questions/4160175/detect-tap-with-pyaudio-from-live-mic
 '''
-class Mic:
 
+
+class Mic:
     INITIAL_TAP_THRESHOLD = 0.010
 
     FORMAT = pyaudio.paInt16
@@ -31,7 +33,7 @@ class Mic:
 
     MIC_DONE = 'mic_done'
 
-    def __init__(self,  config_object: dict):
+    def __init__(self, config_object: dict):
         py_audio = pyaudio.PyAudio()
         self.stream = py_audio.open(format=self.FORMAT,
                                     channels=self.CHANNELS,
@@ -42,7 +44,6 @@ class Mic:
         self.INPUT_BLOCK_TIME = float(config_object['MICROPHONE']["INPUT_BLOCK_TIME"])
         self.noisy_count = self.MAX_TAP_BLOCKS + 1
         self.quiet_count = 0
-        self.queue = queue
         self.error_count = 0
         self.mic_action = self._mic_action()
         # need send None to get to the first yield
@@ -102,11 +103,13 @@ class Mic:
     '''
     proxy to couroutine
     '''
-    def send(self, **kwargs):
-        return self.mic_action.send(kwargs)
+
+    def send(self, action_dict: dict):
+        return self.mic_action.send(action_dict)
 
     '''
     close running coroutine
     '''
+
     def close(self):
         self.mic_action.close()

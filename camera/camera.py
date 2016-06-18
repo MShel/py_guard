@@ -1,11 +1,12 @@
+from asyncio import coroutine
 from cv2 import *
 from datetime import datetime
 from threading import Timer
-from asyncio import coroutine
+
 
 # initialize the camera
 class Camera:
-    #value to return
+    # value to return
     CAMERA_DONE = 'cam_done'
 
     def __init__(self, config_object: dict):
@@ -66,11 +67,13 @@ class Camera:
     '''
     proxy to couroutine
     '''
-    def send(self,**kwargs):
-       return self.camera_action.send(kwargs)
+
+    def send(self, action_dict: dict):
+        return self.camera_action.send(action_dict)
 
     '''
     close running coroutine
     '''
+
     def close(self):
         self.camera_action.close()

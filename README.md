@@ -1,13 +1,12 @@
 # py_guard
 
-[![Coverage Status](https://coveralls.io/repos/github/MShel/py_guard/badge.svg?branch=develop)](https://coveralls.io/github/MShel/py_guard?branch=develop)
+In the dev branch is all the code related implementation
+of whole system with coroutines & generators -  no threads.
+Here is the trello board you can check out to see what is my mind on now.
 
-So The plan is to implement multiThread system
+https://trello.com/b/gxxXDyA4/python-protector
 
-* Thread One - Listen to microphone stuff(for the N db) -> write to Queue, and keep listening 
-* Thread Two - Checking Queue for an _microphone_sentinel -> turn on camera take N pictures put them to archive -> and write _camera_sentinel 
-* Thread Three - Checking Queue for _camera_sentinel  pack all pictures in zip put _archiver_sentinel and archive name into queue
-* Thread Four - Checking queue for _archiver_sentinel get the archive name connect to remote smptp and send it
+### For working multithreaded system plz checkout v 0.0.1
 
 ## Required Libraries:
 * pyaudio

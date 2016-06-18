@@ -2,14 +2,14 @@ import email.mime.multipart
 import mimetypes
 import os
 import smtplib
+from asyncio import coroutine
 from email import encoders
 from email.mime.base import MIMEBase
-from asyncio import coroutine
 
 
 # initialize email
 class Mailer:
-    #value to return
+    # value to return
     MAILER_DONE = 'mailer_done'
 
     def __init__(self, config_object: dict):
@@ -21,7 +21,7 @@ class Mailer:
         self.server.ehlo()
         self.server.login(config_object["EMAILS"]["email"], config_object["EMAILS"]["password"])
         self.mailer_action = self._mailer_action()
-         # need send None to get to the first yield
+        # need send None to get to the first yield
         self.mailer_action.send(None)
 
     @coroutine
@@ -69,11 +69,13 @@ class Mailer:
     '''
     proxy to couroutine
     '''
-    def send(self, **kwargs):
-        return self.mailer_action.send(kwargs)
+
+    def send(self, action_dict: dict):
+        return self.mailer_action.send(action_dict)
 
     '''
     close running coroutine
     '''
+
     def close(self):
         self.mailer_action.close()

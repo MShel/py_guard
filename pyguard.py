@@ -25,12 +25,15 @@ def main():
         probably need a separate config parser and starter classes...?
         '''
         mic = Mic(config_object)
+
         camera = Camera(config_object)
+
         archiver = Archiver(config_object)
-        mailer = Mailer(config_object)
+
+        #mailer = Mailer(config_object)
+        #print('here4')
 
         while True:
-            # tell mic to listen...
             mic_response = mic.send({'action':'listen'})
             #we need to make sure we are not waiting for stuff here...
             if mic_response ==  mic.MIC_DONE:
@@ -38,7 +41,8 @@ def main():
                 if camera_res == camera.CAMERA_DONE:
                     archiver_res = archiver.send({'action':'archive'})
                     if archiver_res == archiver.ARCHIVER_DONE and archiver.zfilename is not None:
-                        mailer.send({'action':'last','last_archive_name':archiver.zfilename})
+                        print('sending mail')
+                        #mailer.send({'action':'last','last_archive_name':archiver.zfilename})
 
 
     except LookupError as e:
@@ -50,7 +54,7 @@ def main():
         camera.close()
         mic.close()
         archiver.close()
-        mailer.close()
+        #mailer.close()
         sys.exit(1)
 
 
