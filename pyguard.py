@@ -25,9 +25,7 @@ def main():
         probably need a separate config parser and starter classes...?
         '''
         mic = Mic(config_object)
-
         camera = Camera(config_object)
-
         archiver = Archiver(config_object)
 
         #mailer = Mailer(config_object)
@@ -36,7 +34,7 @@ def main():
         while True:
             mic_response = mic.send({'action':'listen'})
             #we need to make sure we are not waiting for stuff here...
-            if mic_response ==  mic.MIC_DONE:
+            if mic_response == mic.MIC_DONE:
                 camera_res = camera.send({'action': 'photos'})
                 if camera_res == camera.CAMERA_DONE:
                     archiver_res = archiver.send({'action':'archive'})

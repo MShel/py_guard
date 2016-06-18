@@ -1,7 +1,8 @@
 from asyncio import coroutine
-from cv2 import *
 from datetime import datetime
 from threading import Timer
+
+from cv2 import *
 
 
 # initialize the camera
@@ -23,6 +24,7 @@ class Camera:
     def _camera_action(self):
         while True:
             args = (yield)
+            print(args['action'])
             if args['action'] == 'photos':
                 self.take_some_pictures()
                 yield self.CAMERA_DONE
@@ -40,7 +42,7 @@ class Camera:
                 picturePath = self.pictures_directory + str(datetime.today()) + ".jpg"
                 imwrite(picturePath, img)  # save image
                 self.pictures_taken += 1
-                print("pictures taken " + self.pictures_taken + "\n")
+                print("pictures taken " + str(self.pictures_taken) + "\n")
             if self.pictures_taken == self.pictures_amount:
                 self.pictures_taken = 0
                 self.camera.release()

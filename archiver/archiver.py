@@ -21,7 +21,7 @@ class Archiver:
         while True:
             args = (yield)
             if args['action'] == 'archive':
-                self.archiveFiles()
+                self.archive_files()
                 yield self.ARCHIVER_DONE
             else:
                 raise LookupError('Invalid archiver action')
@@ -33,7 +33,7 @@ class Archiver:
             for file in files:
                 if file.endswith(self.file_type) is True:
                     ziped_file.write(os.path.join(root, file))
-        self.cleanPictures()
+        self.clean_files()
 
     def clean_files(self):
         for root, dirs, files in os.walk(self.file_direcory):
