@@ -54,8 +54,9 @@ class Mic:
         while True:
             args = (yield)
             if args['action'] == 'listen':
+                print(self.listen())
                 if self.listen() is True:
-                    yield self.MIC_TAP_REGISTERED
+                    yield self.MIC_DONE
             else:
                 raise LookupError('Invalid microphone action')
 
@@ -98,7 +99,7 @@ class Mic:
 
             if self.quiet_count > self.UNDERSENSITIVE:
                 self.tap_threshold *= 0.9  # turn up the sensitivity
-        yield result
+        return result
 
     '''
     proxy to couroutine
