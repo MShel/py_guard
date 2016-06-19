@@ -5,7 +5,8 @@ import smtplib
 from asyncio import coroutine
 from email import encoders
 from email.mime.base import MIMEBase
-
+from pprint import pprint
+from inspect import getmembers
 
 # initialize email
 class Mailer:
@@ -13,14 +14,14 @@ class Mailer:
     MAILER_DONE = 'mailer_done'
 
     def __init__(self, config_object: dict):
-        self.pictures_directory = config_object["FILES"]["pictures_directory"]
+        self.pictures_directory = config_object["FILES"]["picture_directory"]
         self.emailTo = config_object["EMAILS"]["email"]
         self.subject = config_object["EMAILS"]["title"]
-        self.emailFrom = config_object["EMAILS"]["pyGuard@localhost"]
-        self.server = smtplib.SMTP_SSL(config_object["EMAILS"]["server_address"], config_object["EMAILS"]["port"])
-        self.server.ehlo()
-        self.server.login(config_object["EMAILS"]["email"], config_object["EMAILS"]["password"])
+        self.emailFrom = config_object["EMAILS"]["from"]
+        #got to store that to be able to reconnect later
+        self.config = config_object
         self.mailer_action = self._mailer_action()
+        self.server_connect()
         # need send None to get to the first yield
         self.mailer_action.send(None)
 
@@ -55,7 +56,12 @@ class Mailer:
                 encoders.encode_base64(msg)
                 msg.add_header('Content-Disposition', 'attachment', filename=archive_name)
             outer.attach(msg)
-            self.server.sendmail(self.emailFrom, self.emailTo, outer.as_string())
+            try:
+                self.server.sendmail(self.emailFrom, self.emailTo, outer.as_string())
+            except smtplib.SMTPServerDisconnected:
+                self.server_connect()
+                self.server.sendmail(self.emailFrom, self.emailTo, outer.as_string())
+
             self.server.close()
 
     def send_all(self):
@@ -65,6 +71,11 @@ class Mailer:
                     file_path = self.pictures_directory + file
                     self.send_last_archive(file_path)
                     os.remove(self.pictures_directory + file)
+
+    def server_connect(self):
+        self.server = smtplib.SMTP_SSL(self.config["EMAILS"]["server_address"], self.config["EMAILS"]["port"])
+        self.server.ehlo()
+        self.server.login(self.config["EMAILS"]["email"], self.config["EMAILS"]["password"])
 
     '''
     proxy to couroutine

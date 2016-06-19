@@ -54,7 +54,6 @@ class Mic:
         while True:
             args = (yield)
             if args['action'] == 'listen':
-                print(self.listen())
                 if self.listen() is True:
                     yield self.MIC_DONE
             else:
@@ -111,6 +110,5 @@ class Mic:
     '''
     close running coroutine
     '''
-
     def close(self):
         self.mic_action.close()

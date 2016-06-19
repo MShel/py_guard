@@ -3,10 +3,10 @@ import os
 import subprocess
 import sys
 
+from archiver.archiver import Archiver
 from camera.camera import Camera
 from config.config import Config
 from microphone.microphone import Mic
-from archiver.archiver import Archiver
 from sender.mailer import Mailer
 
 sys.path.insert(0, os.getcwd())
@@ -27,21 +27,25 @@ def main():
         mic = Mic(config_object)
         camera = Camera(config_object)
         archiver = Archiver(config_object)
-
-        #mailer = Mailer(config_object)
-        #print('here4')
+        mailer = Mailer(config_object)
 
         while True:
-            mic_response = mic.send({'action':'listen'})
-            #we need to make sure we are not waiting for stuff here...
+            mic_response = mic.send({'action': 'listen'})
+            print(".", end="", flush=True)
+
             if mic_response == mic.MIC_DONE:
                 camera_res = camera.send({'action': 'photos'})
+                print('taking photos')
                 if camera_res == camera.CAMERA_DONE:
-                    archiver_res = archiver.send({'action':'archive'})
+                    archiver_res = archiver.send({'action': 'archive'})
+                    print('archiving...')
                     if archiver_res == archiver.ARCHIVER_DONE and archiver.zfilename is not None:
                         print('sending mail')
-                        #mailer.send({'action':'last','last_archive_name':archiver.zfilename})
-
+                        mailer_done = mailer.send({'action': 'last', 'last_archive_name': archiver.zfilename})
+                        if mailer_done == mailer.MAILER_DONE:
+                            print('...cleaning up')
+                            archiver.send({'action': 'clearup'})
+                            print('cycle done...')
 
     except LookupError as e:
         print(e)
@@ -52,7 +56,7 @@ def main():
         camera.close()
         mic.close()
         archiver.close()
-        #mailer.close()
+        mailer.close()
         sys.exit(1)
 
 
