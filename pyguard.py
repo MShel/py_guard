@@ -27,25 +27,19 @@ def main():
         mic = Mic(config_object)
         camera = Camera(config_object)
         archiver = Archiver(config_object)
-        mailer = Mailer(config_object)
+        #mailer = Mailer(config_object)
 
         while True:
             mic_response = mic.send({'action': 'listen'})
             print(".", end="", flush=True)
-
             if mic_response == mic.MIC_DONE:
                 camera_res = camera.send({'action': 'photos'})
-                print('taking photos')
                 if camera_res == camera.CAMERA_DONE:
                     archiver_res = archiver.send({'action': 'archive'})
-                    print('archiving...')
                     if archiver_res == archiver.ARCHIVER_DONE and archiver.zfilename is not None:
-                        print('sending mail')
-                        mailer_done = mailer.send({'action': 'last', 'last_archive_name': archiver.zfilename})
+                        #mailer_done = mailer.send({'action': 'last', 'last_archive_name': archiver.zfilename})
                         if mailer_done == mailer.MAILER_DONE:
-                            print('...cleaning up')
                             archiver.send({'action': 'clearup'})
-                            print('cycle done...')
 
     except LookupError as e:
         print(e)
