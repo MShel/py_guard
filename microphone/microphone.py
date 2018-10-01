@@ -18,7 +18,7 @@ class Mic:
     SHORT_NORMALIZE = (1.0 / 32768.0)
 
     CHANNELS = 2
-
+    
     RATE = 44100
 
     INPUT_BLOCK_TIME = 0.05
@@ -33,13 +33,12 @@ class Mic:
 
     MIC_DONE = 'mic_done'
 
+    error_count = 0
+
+    stream = None
+
     def __init__(self, config_object: dict):
-        py_audio = pyaudio.PyAudio()
-        self.stream = py_audio.open(format=self.FORMAT,
-                                    channels=self.CHANNELS,
-                                    rate=self.RATE,
-                                    input=True,
-                                    frames_per_buffer=self.INPUT_FRAMES_PER_BLOCK)
+        self.stream = self.get_new_stream()
         self.tap_threshold = float(config_object['MICROPHONE']["tap_treshhold"])
         self.INPUT_BLOCK_TIME = float(config_object['MICROPHONE']["INPUT_BLOCK_TIME"])
         self.noisy_count = self.MAX_TAP_BLOCKS + 1
@@ -77,11 +76,13 @@ class Mic:
     def listen(self):
         result = False
         try:
-            block = self.stream.read(self.INPUT_FRAMES_PER_BLOCK)  # |
-        except IOError as e:  # |---- just in case there is an error!
-            self.error_count += 1  # |
-            print("(%d) Error recording: %s" % (self.errorcount, e))  # |
-            self.noisy_count = 1  # ]
+            block = self.stream.read(self.INPUT_FRAMES_PER_BLOCK) 
+        except IOError as e:  
+            self.error_count += 1  
+            print("(%d) Error recording: %s" % (self.error_count, e))
+            self.noisy_count = 1 
+            self.stream =  self.get_new_stream()
+            return
 
         amplitude = self.get_rms(block)
 
@@ -103,9 +104,17 @@ class Mic:
     '''
     proxy to couroutine
     '''
-
     def send(self, action_dict: dict):
         return self.mic_action.send(action_dict)
+
+    def get_new_stream(self):
+        py_audio = pyaudio.PyAudio()
+        self.stream = py_audio.open(format=self.FORMAT,
+                                    channels=self.CHANNELS,
+                                    rate=self.RATE,
+                                    input=True,
+                                    frames_per_buffer=self.INPUT_FRAMES_PER_BLOCK)
+        return self.stream
 
     '''
     close running coroutine

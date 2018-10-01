@@ -27,7 +27,7 @@ https://trello.com/b/gxxXDyA4/python-protector
 * email address
 
 
-## Installation on IOS:
+## Installation on apple(mac os):
 * brew install portaudio
 * pip install -r requirements.txt
 * adjust config/config.ini to have proper credentials
